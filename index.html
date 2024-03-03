@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Plastic-Free Farm</title>
+<style>
+  body {
+    font-family: 'Arial', sans-serif;
+    background-color: #fce8d8; /* Soft peach background */
+    margin: 0;
+    padding: 0;
+  }
+
+  .container {
+    max-width: 800px;
+    margin: 0 auto;
+    text-align: center;
+    padding: 20px;
+    background: rgba(255, 255, 255, 0.9); /* Transparent white background */
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1), inset 0 0 20px rgba(255, 255, 255, 0.5); /* Inner shadow for glassy effect */
+    animation: fadeIn 0.5s ease; /* Fade-in animation */
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  h1 {
+    font-size: 36px;
+    color: #333;
+    text-shadow: 1px 1px 0px rgba(255, 255, 255, 0.3); /* Subtle text shadow */
+    margin-bottom: 30px; /* Increase space below heading */
+  }
+
+  .button {
+    display: inline-block;
+    padding: 10px 20px;
+    margin: 10px;
+    background-color: #6ab04c; /* Green button */
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    text-decoration: none;
+    transition: background-color 0.3s ease;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Button shadow */
+  }
+
+  .button:hover {
+    background-color: #579e3c; /* Darker green on hover */
+  }
+
+  .status {
+    font-size: 24px;
+    margin-top: 20px;
+    color: #333;
+    text-shadow: 0 1px 1px rgba(255, 255, 255, 0.3); /* Text shadow for readability */
+  }
+
+  #timer {
+    font-size: 18px;
+    margin-top: 10px;
+    color: #777;
+  }
+
+  #money {
+    margin-top: 20px;
+    font-size: 20px;
+    color: #333;
+    text-shadow: 0 1px 1px rgba(255, 255, 255, 0.3); /* Text shadow for readability */
+  }
+
+  .progress-bar {
+    width: 100%;
+    height: 25px;
+    background-color: #ddd;
+    border-radius: 10px;
+    margin-top: 20px;
+    overflow: hidden;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  }
+
+  .progress {
+    width: 0;
+    height: 30px;
+    background-color: #6ab04c; /* Green progress bar */
+    border-radius: 5px;
+    text-align: center;
+    line-height: 30px;
+    color: white;
+    transition: width 0.3s ease;
+    box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.2);
+  }
+
+  /* Tooltips for button emojis */
+  .button::before {
+    content: attr(data-emoji);
+    font-size: 20px;
+    margin-right: 5px;
+    display: inline-block;
+    position: relative;
+    top: 4px;
+  }
+
+  /* Floating animation for buttons */
+  .button:hover {
+    transform: translateY(-2px);
+  }
+
+  .message {
+    font-size: 18px;
+    margin-top: 50px;
+    color: #555;
+  }
+</style>
+</head>
+<body>
+<div class="container">
+    <h1>Plastic-Free Farm</h1>
+    <button class="button" onclick="plantCrop()">Plant Crop 🌽</button>
+    <button class="button" onclick="harvest()" id="harvestButton" disabled>Harvest 🚜</button>
+    <button class="button" onclick="sellCrops()">Sell Crops 💸</button>
+    <button class="button" onclick="location.href='sell.html'">Marketplace 💰</button>
+    <button class="button" onclick="location.href='dailyQuests.html'">Daily Quests ♻️</button> <!-- New button for daily quests -->
+    <div class="status" id="status"></div>
+    <div id="timer"></div>
+    <div id="money"></div>
+    <div class="progress-bar">
+        <div class="progress" id="progress"></div>
+    </div>
+    <div class="message">
+        <p>Join us in our mission to combat plastic pollution. Together, we can create a world where plastic-free farms are the norm, and our environment thrives in harmony with nature. Every small action counts!</p>
+    </div>
+</div>
+
+<script>
+    let crops = 0;
+    let timerInterval;
+    let harvestButton = document.getElementById("harvestButton");
+    let cropsOwned = parseInt(localStorage.getItem('cropsOwned')) || 0;
+    let money = parseInt(localStorage.getItem('money')) || 0;
+    let xp = parseInt(localStorage.getItem('xp')) || 0;
+    let level = parseInt(localStorage.getItem('level')) || 1;
+    let xpToNextLevel = 100; // Example: 100 XP required for each level
+    let upgradeFarmToolsOwned = parseInt(localStorage.getItem('ownedUpgradeFarmTools')) || 0;
+let collectibleScarecrowOwned = parseInt(localStorage.getItem('ownedCollectibleScarecrow')) || 0;
+let greenhouseUpgradeOwned = parseInt(localStorage.getItem('ownedGreenhouseUpgrade')) || 0;
+let recyclingMachineOwned = parseInt(localStorage.getItem('ownedRecyclingMachine')) || 0;
+    function plantCrop() {
+        if (!timerInterval) {
+            crops += 1 + upgradeFarmToolsOwned; // Increase crop per plant based on Upgrade Farm Tools
+            updateStatus();
+            startTimer();
+            harvestButton.disabled = true; // Disable harvest button after planting
+        } else {
+            alert("You can't plant more crops until you harvest.");
+        }
+    }
+
+    function startTimer() {
+        let timeLeft = 10 / (1 + collectibleScarecrowOwned); // Adjust harvesting speed based on Collectible Scarecrow
+        harvestButton.disabled = true;
+        timerInterval = setInterval(() => {
+            document.getElementById("timer").textContent = `Time until harvest: ${timeLeft.toFixed(1)} seconds`;
+            timeLeft -= 0.1;
+            if (timeLeft <= 0) {
+                clearInterval(timerInterval);
+                harvestButton.disabled = false;
+                document.getElementById("timer").textContent = "Ready to harvest!";
+            }
+        }, 100);
+    }
+
+    function harvest() {
+        clearInterval(timerInterval);
+        timerInterval = null;
+        alert("Congratulations! You harvested the crops sustainably.");
+        cropsOwned += crops * (1 + greenhouseUpgradeOwned);
+        localStorage.setItem('cropsOwned', cropsOwned);
+        crops = 0;
+        xp += 10 * (1 + recyclingMachineOwned); // Increase experience gain based on Recycling Machine
+        localStorage.setItem('xp', xp);
+        checkLevel();
+        updateStatus();
+        harvestButton.disabled = true; // Disable harvest button after harvesting
+    }
+
+    function sellCrops() {
+        if (cropsOwned > 0) {
+            money += 10 * cropsOwned;
+            localStorage.setItem('money', money);
+            alert(`You sold ${cropsOwned} crops for $${10 * cropsOwned}.`);
+            cropsOwned = 0;
+            localStorage.setItem('cropsOwned', cropsOwned);
+            updateStatus();
+        } else {
+            alert("You don't have any crops to sell.");
+        }
+    }
+
+    function checkLevel() {
+        if (xp >= xpToNextLevel) {
+            level++;
+            localStorage.setItem('level', level);
+            xp -= xpToNextLevel;
+            localStorage.setItem('xp', xp);
+            xpToNextLevel *= 2; // Example: Double XP required for each level
+            alert(`Congratulations! You reached level ${level}.`);
+        }
+    }
+
+    function updateStatus() {
+        document.getElementById("status").innerHTML = `Crops Planted: ${crops} | Crops Owned: ${cropsOwned}`;
+        document.getElementById("money").innerHTML = `Money: $${money}`;
+        document.getElementById("progress").style.width = `${(xp / xpToNextLevel) * 100}%`;
+        document.getElementById("progress").textContent = `Level ${level} (${xp}/${xpToNextLevel} XP)`;
+
+        console.log("Upgrade Farm Tools Owned:", upgradeFarmToolsOwned);
+    console.log("Collectible Scarecrow Owned:", collectibleScarecrowOwned);
+    console.log("Greenhouse Upgrade Owned:", greenhouseUpgradeOwned);
+    console.log("Recycling Machine Owned:", recyclingMachineOwned);
+    }
+
+    updateStatus();
+</script>
+</body>
+</html>

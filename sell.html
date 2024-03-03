@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Marketplace</title>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #f5f5f5;
+        margin: 0;
+        padding: 0;
+    }
+    .container {
+        max-width: 600px;
+        margin: 0 auto;
+        text-align: center;
+        padding: 20px;
+        background: linear-gradient(135deg, #ffffff, #f0f0f0); /* Gradient background */
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Outer shadow */ /* Added inner shadow for a glassy look */
+        animation: fadeIn 0.5s ease;
+    }
+    @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+    h1 {
+        font-size: 36px;
+        color: #333;
+        text-shadow: 1px 1px 0px rgba(255, 255, 255, 0.3); /* Added subtle text shadow */
+    }
+    .item {
+        margin: 20px;
+        padding: 20px;
+        border-radius: 10px;
+        background: linear-gradient(135deg, #ffffff, #e6f7ff); /* Gradient background */
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Inner shadow */
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .item:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    }
+    .item h2 {
+        font-size: 24px;
+        margin-bottom: 10px;
+    }
+    .button {
+        display: inline-block;
+        padding: 10px 20px;
+        margin: 10px;
+        background-color: #4CAF50;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        text-decoration: none;
+        transition: background-color 0.3s ease, transform 0.2s ease;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Added button shadow */
+    }
+    .button:hover {
+        background-color: #45a049;
+        transform: translateY(-2px);
+    }
+    .status {
+        font-size: 24px;
+        margin-top: 20px;
+    }
+    
+
+</style>
+</head>
+<body>
+<div class="container">
+    <h1>Marketplace</h1>
+    <div class="item">
+        <h2>Upgrade Farm Tools</h2>
+        <p>Price: $50</p>
+        <p>Owned: <span id="ownedUpgradeFarmTools">0</span></p>
+        <p>Boost: +1 crop per plant</p> <!-- Enhancement: Increased crop yield -->
+        <button class="button" onclick="purchase('Upgrade Farm Tools', 50, 'ownedUpgradeFarmTools', 'cropBoost')">Purchase</button>
+    </div>
+    <div class="item">
+        <h2>Collectible Scarecrow</h2>
+        <p>Price: $20</p>
+        <p>Owned: <span id="ownedCollectibleScarecrow">0</span></p>
+        <p>Boost: +10% harvesting speed</p> <!-- Enhancement: Faster harvesting -->
+        <button class="button" onclick="purchase('Collectible Scarecrow', 20, 'ownedCollectibleScarecrow', 'harvestBoost')">Purchase</button>
+    </div>
+    <div class="item">
+        <h2>Greenhouse Upgrade</h2>
+        <p>Price: $100</p>
+        <p>Owned: <span id="ownedGreenhouseUpgrade">0</span></p>
+        <p>Boost: Double crop yield</p> <!-- Enhancement: Increased crop yield -->
+        <button class="button" onclick="purchase('Greenhouse Upgrade', 100, 'ownedGreenhouseUpgrade', 'doubleYield')">Purchase</button>
+    </div>
+    <div class="item">
+        <h2>Recycling Machine</h2>
+        <p>Price: $150</p>
+        <p>Owned: <span id="ownedRecyclingMachine">0</span></p>
+        <p>Boost: +20% experience gain</p> <!-- Enhancement: Bonus experience points -->
+        <button class="button" onclick="purchase('Recycling Machine', 150, 'ownedRecyclingMachine', 'xpBoost')">Purchase</button>
+    </div>
+    <div class="status" id="status"></div>
+    <button class="button" onclick="location.href='index.html'">Go Back</button>
+</div>
+
+<script>
+    let money = parseInt(localStorage.getItem('money')) || 0;
+    let ownedItems = JSON.parse(localStorage.getItem('ownedItems')) || {};
+    let upgradeFarmToolsOwned = parseInt(localStorage.getItem('ownedUpgradeFarmTools')) || 0;
+    let collectibleScarecrowOwned = parseInt(localStorage.getItem('ownedCollectibleScarecrow')) || 0;
+    let greenhouseUpgradeOwned = parseInt(localStorage.getItem('ownedGreenhouseUpgrade')) || 0;
+    let recyclingMachineOwned = parseInt(localStorage.getItem('ownedRecyclingMachine')) || 0;
+
+    function purchase(item, price, itemID, boostVariable) {
+        if (money >= price) {
+            money -= price;
+            localStorage.setItem('money', money);
+            if (!ownedItems[itemID]) {
+                ownedItems[itemID] = 0;
+            }
+            ownedItems[itemID]++;
+            localStorage.setItem('ownedItems', JSON.stringify(ownedItems));
+            document.getElementById(itemID).textContent = ownedItems[itemID];
+            alert(`You purchased ${item} for $${price}.`);
+
+            // Update the corresponding upgrade variable based on the boostVariable
+            if (boostVariable === 'ownedUpgradeFarmTools') {
+                upgradeFarmToolsOwned = ownedItems[itemID];
+            } else if (boostVariable === 'ownedCollectibleScarecrow') {
+                collectibleScarecrowOwned = ownedItems[itemID];
+            } else if (boostVariable === 'ownedGreenhouseUpgrade') {
+                greenhouseUpgradeOwned = ownedItems[itemID];
+            } else if (boostVariable === 'ownedRecyclingMachine') {
+                recyclingMachineOwned = ownedItems[itemID];
+            }
+
+            // Update the local storage for the corresponding upgrade variable
+            localStorage.setItem(boostVariable, ownedItems[itemID]);
+
+            updateStatus();
+        } else {
+            alert("Insufficient funds.");
+        }
+    }
+
+    function updateStatus() {
+        document.getElementById("status").innerHTML = `Money: $${money}`;
+    }
+
+    // Update owned items count on page load
+    for (let itemID in ownedItems) {
+        if (ownedItems.hasOwnProperty(itemID)) {
+            document.getElementById(itemID).textContent = ownedItems[itemID];
+        }
+    }
+
+    updateStatus();
+</script>
+
+</body>
+</html>

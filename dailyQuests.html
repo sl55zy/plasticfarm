@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Daily Quests</title>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #f5f5f5;
+        margin: 0;
+        padding: 0;
+    }
+    .container {
+        max-width: 800px;
+        margin: 0 auto;
+        text-align: center;
+        padding: 20px;
+        background: #fff;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1), inset 0 0 20px rgba(255, 255, 255, 0.5); 
+        animation: fadeIn 0.5s ease;
+    }
+    @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+    h1 {
+        font-size: 36px;
+        color: #333;
+        text-shadow: 1px 1px 0px rgba(255, 255, 255, 0.3); /* Added subtle text shadow */
+    }
+    .quest {
+        border: 1px solid #ccc;
+        border-radius: 10px;
+        padding: 20px;
+        margin: 20px;
+        background-color: #f9f9f9;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .quest:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    }
+    .reward {
+        font-style: italic;
+    }
+    .button {
+        display: inline-block;
+        padding: 10px 20px;
+        margin: 10px;
+        background-color: #4CAF50;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        text-decoration: none;
+        transition: background-color 0.3s ease, transform 0.2s ease;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Added button shadow */
+    }
+    .button:hover {
+        background-color: #45a049;
+        transform: translateY(-2px);
+    }
+    .status {
+        font-size: 24px;
+        margin-top: 20px;
+    }
+</style>
+</head>
+<body>
+<div class="container">
+    <h1>Daily Quests</h1>
+    <p>Money: $<span id="moneyCount">0</span></p> <!-- Display money count -->
+    <div class="quest" id="morningCleanupQuest">
+        <h2>Morning Cleanup</h2>
+        <p>Clean up 10 pieces of plastic waste from your local park.</p>
+        <p>Reward: <span class="reward">5 coins</span></p>
+        <input type="file" id="morningCleanupImage" accept="image/*">
+        <button class="button" onclick="completeDailyQuest('morningCleanupQuest', 'Morning Cleanup', 5, 'morningCleanupImage')">Complete</button>
+    </div>
+    <div class="quest" id="plasticFreeLunchQuest">
+        <h2>Plastic-Free Lunch</h2>
+        <p>Prepare and have a lunch using no single-use plastic items.</p>
+        <p>Reward: <span class="reward">10 coins</span></p>
+        <input type="file" id="plasticFreeLunchImage" accept="image/*">
+        <button class="button" onclick="completeDailyQuest('plasticFreeLunchQuest', 'Plastic-Free Lunch', 10, 'plasticFreeLunchImage')">Complete</button>
+    </div>
+    <div class="quest" id="educationalArticleQuest">
+        <h2>Educational Article</h2>
+        <p>Write and share an article on social media about the impact of plastic pollution.</p>
+        <p>Reward: <span class="reward">15 coins</span></p>
+        <input type="file" id="educationalArticleImage" accept="image/*">
+        <button class="button" onclick="completeDailyQuest('educationalArticleQuest', 'Educational Article', 15, 'educationalArticleImage')">Complete</button>
+    </div>
+    <button class="button" onclick="location.href='index.html'">Go Back</button>
+</div>
+
+<script>
+    // Initialize money count
+    let money = parseInt(localStorage.getItem('money')) || 0;
+    document.getElementById('moneyCount').textContent = money;
+
+    // Function to remove a quest from the UI
+    function removeQuest(questId) {
+        const questElement = document.getElementById(questId);
+        if (questElement) {
+            questElement.remove();
+        }
+    }
+
+    // Check and remove completed quests from the UI when the page loads
+    ['morningCleanupQuest', 'plasticFreeLunchQuest', 'educationalArticleQuest'].forEach(questId => {
+        if (localStorage.getItem(questId)) {
+            removeQuest(questId);
+        }
+    });
+
+    function completeDailyQuest(questId, questTitle, reward, inputId) {
+        const imageInput = document.getElementById(inputId);
+        const imageFile = imageInput.files[0];
+        if (imageFile) {
+            // Upload image file
+            // Code to upload image file to server would go here
+            
+            // Simulate receiving reward (money)
+            money += reward;
+            localStorage.setItem('money', money);
+            document.getElementById('moneyCount').textContent = money; // Update money count
+            
+            // Remove the quest from the UI
+            removeQuest(questId);
+            
+            // Remove the quest from local storage
+            localStorage.setItem(questId, 'completed');
+            
+            // Display completion message
+            alert(`${questTitle} completed!`);
+        } else {
+            alert("Please upload a confirmation image.");
+        }
+    }
+</script>
+</body>
+</html>
